@@ -3,6 +3,7 @@ import 'package:basic_1/form_screen.dart';
 import 'package:basic_1/gridview_widgets.dart';
 import 'package:basic_1/listview_widgets.dart';
 import 'package:basic_1/page_switcher.dart';
+import 'package:basic_1/screen/home_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
       ),
-      home: FormScreen(),
+      home: HomePage(),
     );
   }
 }
