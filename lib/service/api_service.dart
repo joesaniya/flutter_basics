@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:basic_1/modal/post_modal.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -54,10 +53,12 @@ class ApiService {
     final response = await http.put(
       Uri.parse('https://jsonplaceholder.typicode.com/posts/$id'),
       headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(data),
     );
     log('response code:${response.statusCode}');
     if (response.statusCode == 200) {
       log('updated successfully');
+      return jsonDecode(response.body);
     } else {
       log('not updated');
     }

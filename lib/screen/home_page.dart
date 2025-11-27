@@ -34,12 +34,25 @@ class _HomePageState extends State<HomePage> {
   TextEditingController postIdController = TextEditingController();
   TextEditingController titleControler = TextEditingController();
   TextEditingController bodyController = TextEditingController();
-  void addItemUIAlert() {
+  void addItemUIAlert({Post? existingPost}) {
+    // log('Existing Post: ${existingPost!.body}');
+    bool isUpdate = existingPost != null;
+    log('Is update: $isUpdate');
+    if (isUpdate) {
+      postIdController.text = existingPost!.id.toString();
+      titleControler.text = existingPost.title;
+      bodyController.text = existingPost.body;
+    } else {
+      postIdController.clear();
+      titleControler.clear();
+      bodyController.clear();
+    }
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add Item'),
+          title: Text(isUpdate ? 'Update Item' : 'Add Item'),
           content: Container(
             height: 200,
 
@@ -110,17 +123,31 @@ class _HomePageState extends State<HomePage> {
                     );
                     return;
                   }
-                  ApiService().createPost(
-                    Post(
-                      userId: 90,
-                      id: parsedId,
-                      title: titleControler.text,
-                      body: bodyController.text,
-                    ),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('post added was successfully!')),
-                  );
+                  if (isUpdate) {
+                    log('updating post id:${existingPost!.id}');
+                    ApiService().updatePost(existingPost!.id, {
+                      'id': parsedId,
+                      'title': titleControler.text,
+                      'body': bodyController.text,
+                      'userId': existingPost.userId,
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('updated successfully!')),
+                    );
+                    fetchApi();
+                  } else {
+                    ApiService().createPost(
+                      Post(
+                        userId: 90,
+                        id: parsedId,
+                        title: titleControler.text,
+                        body: bodyController.text,
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('post added was successfully!')),
+                    );
+                  }
                   postIdController.clear();
                   titleControler..clear();
                   bodyController..clear();
@@ -131,7 +158,7 @@ class _HomePageState extends State<HomePage> {
                   ).showSnackBar(SnackBar(content: Text('Not validated')));
                 }
               },
-              child: Text('Add'),
+              child: Text(isUpdate ? 'Update' : 'Add'),
             ),
           ],
         );
@@ -183,19 +210,33 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Align(
-                        alignment: AlignmentGeometry.centerRight,
-                        child: IconButton(
-                          onPressed: () {
-                            log('Delete Id:${post[index].id}');
-                            ApiService().deletePost(post[index].id);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Deleted Sucessfully!!')),
-                            );
-                          },
-                          icon: Icon(Icons.delete, color: Colors.red),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              log('Edit Id:${post[index].id}');
+                              addItemUIAlert(existingPost: post[index]);
+                            },
+                            child: Icon(Icons.edit, color: Colors.green),
+                          ),
+                          SizedBox(width: 16),
+                          GestureDetector(
+                            onTap: () {
+                              log('Delete Id:${post[index].id}');
+                              ApiService().deletePost(post[index].id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Deleted Sucessfully!!'),
+                                ),
+                              );
+                            },
+                            child: Icon(Icons.delete, color: Colors.red),
+                          ),
+                        ],
                       ),
+
                       Text(
                         post[index].title,
                         style: TextStyle(
