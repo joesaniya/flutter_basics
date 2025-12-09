@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'dart:ffi';
 
+import 'package:basic_1/bottomsheet_widget.dart';
+import 'package:basic_1/drawer_widget.dart';
 import 'package:basic_1/modal/post_modal.dart';
 import 'package:basic_1/service/api_service.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,8 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
+  
+
   fetchApi() async {
     log('api call');
     final datas = await ApiService().fetchPost();
@@ -31,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   final addformKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController postIdController = TextEditingController();
   TextEditingController titleControler = TextEditingController();
   TextEditingController bodyController = TextEditingController();
@@ -54,7 +59,7 @@ class _HomePageState extends State<HomePage> {
         return AlertDialog(
           title: Text(isUpdate ? 'Update Item' : 'Add Item'),
           content: Container(
-            height: 200,
+            height: 240,
 
             child: Form(
               key: addformKey,
@@ -169,7 +174,22 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Home Page')),
+      key: scaffoldKey,
+      appBar: AppBar(
+        title: Text('Home Page'),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu_open),
+            onPressed: () {
+              log('drawer open clicked');
+              // scaffoldKey.currentState!.openDrawer();
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
+      ),
+
+      drawer: DrawerWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           addItemUIAlert();
@@ -194,64 +214,116 @@ class _HomePageState extends State<HomePage> {
         },
         child: Icon(Icons.add),
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              physics: BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              log('Edit Id:${post[index].id}');
-                              addItemUIAlert(existingPost: post[index]);
-                            },
-                            child: Icon(Icons.edit, color: Colors.green),
-                          ),
-                          SizedBox(width: 16),
-                          GestureDetector(
-                            onTap: () {
-                              log('Delete Id:${post[index].id}');
-                              ApiService().deletePost(post[index].id);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Deleted Sucessfully!!'),
-                                ),
-                              );
-                            },
-                            child: Icon(Icons.delete, color: Colors.red),
-                          ),
-                        ],
-                      ),
-
-                      Text(
-                        post[index].title,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(post[index].body),
-                    ],
-                  ),
-                );
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: () {
+                log('bottom sheet clicked');
+                BottomSheetWidgetClass().BottomSheetWidget(context);
               },
-              itemCount: post.length,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.only(right: 16),
+                  // alignment: Alignment.centerRight,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.blueAccent.shade400,
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    'Posts',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                ),
+              ),
             ),
+            SizedBox(height: 6),
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Expanded(
+                    child: ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          margin: EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 16,
+                          ),
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      log('Edit Id:${post[index].id}');
+                                      addItemUIAlert(existingPost: post[index]);
+                                    },
+                                    child: Icon(
+                                      Icons.edit,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  GestureDetector(
+                                    onTap: () {
+                                      log('Delete Id:${post[index].id}');
+                                      ApiService().deletePost(post[index].id);
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Deleted Sucessfully!!',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              Text(
+                                post[index].title,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(post[index].body),
+                            ],
+                          ),
+                        );
+                      },
+                      itemCount: post.length,
+                    ),
+                  ),
+          ],
+        ),
+      ),
     );
   }
 }
