@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:basic_1/welcome_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({super.key});
@@ -11,6 +12,30 @@ class FormScreen extends StatefulWidget {
 }
 
 class _FormScreenState extends State<FormScreen> {
+  void login() async {
+    if (formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Processing Data')));
+      //sharepref
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setBool('isLoggedIn', true);
+      prefs.setString('name', nameController.text);
+      prefs.setString('email', emailController.text);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WelcomeScreen(
+            name: nameController.text,
+            email: emailController.text,
+          ),
+        ),
+      );
+    } else {
+      log('Not Validated');
+    }
+  }
+
   final formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -77,22 +102,7 @@ class _FormScreenState extends State<FormScreen> {
                     ),
                   ),
                   onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Processing Data')),
-                      );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => WelcomeScreen(
-                            name: nameController.text,
-                            email: emailController.text,
-                          ),
-                        ),
-                      );
-                    } else {
-                      log('Not Validated');
-                    }
+                    login();
                   },
                   child: Center(
                     child: Text(

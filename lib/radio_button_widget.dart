@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:basic_1/slider_widget.dart';
 import 'package:flutter/material.dart';
 
 class RadioButtonWidget extends StatefulWidget {
@@ -11,6 +12,12 @@ class RadioButtonWidget extends StatefulWidget {
 
 class _RadioButtonWidgetState extends State<RadioButtonWidget> {
   String selectedValue = "Female";
+
+  bool isChecked = false;
+
+  bool fruitCheck1 = false;
+  bool fruitCheck2 = false;
+  bool fruitCheck3 = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,6 +25,35 @@ class _RadioButtonWidgetState extends State<RadioButtonWidget> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  transitionDuration: Duration(milliseconds: 500),
+                  pageBuilder: (context, animation, secondaryAnimation) {
+                    return RotationTransition(
+                      turns: animation,
+                      child: SliderWidget(),
+                    );
+                    //fadein
+                    /* return FadeTransition(
+                      opacity: animation,
+                      child: SliderWidget(),
+                    );*/
+                  },
+                ),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.purple, width: 2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: EdgeInsets.all(16),
+              child: Text('Slide widget'),
+            ),
+          ),
+          SizedBox(height: 10),
           Container(
             child: Column(
               children: [
@@ -90,6 +126,95 @@ class _RadioButtonWidgetState extends State<RadioButtonWidget> {
                       log(' Selected Value: $selectedValue  ');
                     });
                   },
+                ),
+              ],
+            ),
+          ),
+
+          Container(
+            child: Column(
+              children: [
+                Text(
+                  'Checkbox',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+
+                Row(
+                  children: [
+                    Text('Accept Terms and Conditions'),
+                    Checkbox(
+                      value: isChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          isChecked = value!;
+                          log(' Checkbox isChecked: $isChecked  ');
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          Container(
+            child: Column(
+              children: [
+                Text(
+                  'CheckboxListTile',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+
+                CheckboxListTile(
+                  value: isChecked,
+                  activeColor: Colors.green,
+                  title: Text('Accept Terms and Conditions'),
+                  onChanged: (value) {
+                    setState(() {
+                      isChecked = value!;
+                      log(' Checkbox isChecked: $isChecked  ');
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          Container(
+            child: Column(
+              children: [
+                Text(
+                  'Multiple option using Checkbox',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+
+                Row(
+                  children: [
+                    Text('Fruit 1'),
+                    Checkbox(
+                      value: fruitCheck1,
+                      onChanged: (value) {
+                        setState(() {
+                          fruitCheck1 = value!;
+                          log(' Checkbox isChecked: $fruitCheck1 ');
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text('Fruit 2'),
+                    Checkbox(
+                      value: fruitCheck2,
+                      onChanged: (value) {
+                        setState(() {
+                          fruitCheck2 = value!;
+                          log(' Checkbox isChecked: $fruitCheck2 ');
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

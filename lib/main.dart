@@ -5,6 +5,8 @@ import 'package:basic_1/listview_widgets.dart';
 import 'package:basic_1/page_switcher.dart';
 import 'package:basic_1/radio_button_widget.dart';
 import 'package:basic_1/screen/home_page.dart';
+import 'package:basic_1/splash_screen.dart';
+import 'package:basic_1/white_board/white_board_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 
@@ -24,7 +26,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
       ),
-      home: RadioButtonWidget(),
+      // home: WhiteboardScreen(),
+      home: SplashScreen(),
       //home: HomePage(),
     );
   }
