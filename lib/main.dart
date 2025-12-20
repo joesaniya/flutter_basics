@@ -1,11 +1,13 @@
 import 'package:basic_1/assignment_issue.dart';
 import 'package:basic_1/form_screen.dart';
 import 'package:basic_1/gridview_widgets.dart';
+import 'package:basic_1/image_selector/image_pick.dart';
 import 'package:basic_1/listview_widgets.dart';
 import 'package:basic_1/page_switcher.dart';
 import 'package:basic_1/radio_button_widget.dart';
 import 'package:basic_1/screen/home_page.dart';
 import 'package:basic_1/splash_screen.dart';
+import 'package:basic_1/stack_widgets.dart';
 import 'package:basic_1/white_board/white_board_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
@@ -27,7 +29,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
       ),
       // home: WhiteboardScreen(),
-      home: SplashScreen(),
+      // home: ImagePick(),
+      home: StackWidgets(),
+      // home: SplashScreen(),//preference
       //home: HomePage(),
     );
   }
