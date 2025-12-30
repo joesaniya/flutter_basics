@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
 class LocationView extends StatefulWidget {
@@ -11,7 +12,8 @@ class LocationView extends StatefulWidget {
 }
 
 class _LocationViewState extends State<LocationView> {
-  Future<Position> getLocation() async {
+  /*Future<Position> for the coordinated*/
+  Future<String> getLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -33,7 +35,20 @@ class _LocationViewState extends State<LocationView> {
       );
     }
 
-    return await Geolocator.getCurrentPosition(
+    /*return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+      locationSettings: AndroidSettings(
+        accuracy: LocationAccuracy.high,
+        intervalDuration: const Duration(seconds: 5),
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationText: "Location services are running in the background",
+          notificationTitle: "Using Location",
+          enableWakeLock: true,
+        ),
+      ),
+    );for get the coordinates*/
+
+    Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
       locationSettings: AndroidSettings(
         accuracy: LocationAccuracy.high,
@@ -45,22 +60,40 @@ class _LocationViewState extends State<LocationView> {
         ),
       ),
     );
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      position.latitude,
+      position.longitude,
+    );
+    Placemark place = placemarks[0];
+    log(
+      'Address: ${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}',
+    );
+    return '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
   }
 
   Position? position;
   @override
   void initState() {
     super.initState();
-    fetchLocation();
+    fetchAddress();
+    // fetchLocation();
   }
 
-  void fetchLocation() async {
+  String? address;
+  void fetchAddress() async {
+    String result = await getLocation();
+    address = result;
+    setState(() {});
+    log('Address: $address');
+  }
+  /*void fetchLocation() async {
     Position pos = await getLocation();
     setState(() {
       position = pos;
     });
     log('Latitude: ${position!.latitude}, Longitude: ${position!.longitude}');
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -70,11 +103,16 @@ class _LocationViewState extends State<LocationView> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          position != null
+          /* position != null
               ? Text(
                   'Latitude: ${position!.latitude}, Longitude: ${position!.longitude}',
                 )
-              : Text('Location not available'),
+              : Text('Location not available'),*/
+          address!.isNotEmpty
+              ? Text('Address: $address')
+              : const Text('Fetching address...'),
+
+          SizedBox(height: 20),
           /*ElevatedButton(
             onPressed: () async {
               Position position = await getLocation();
